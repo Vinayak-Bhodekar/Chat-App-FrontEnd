@@ -3,9 +3,22 @@ import React, { useState } from 'react'
 import {useNavigate} from "react-router-dom"
 import ProfileCard from '../components/ProfileCard'
 import EditProfile from '../components/EditProfile'
+import FriendList from '../components/FriendList'
+import AddFriendDashboard from '../components/AddFriendDashboard'
+import Setting from '../components/Setting'
+
+const dummyFriends = [
+  { name: "Summit", avatar: "", lastMessage: "Hey, what’s up?" },
+  { name: "Vinayak", avatar: "", lastMessage: "Working on project 🚀" },
+  { name: "Ravi", avatar: "", lastMessage: "See you tomorrow!" },
+];
+
 function Dashboard() {
 
     const [showEdit, setShowEdit] = useState(false)
+    const [showAddFriend, setShowAddFriend] = useState(false)
+    const [showSetting, setShowSetting] = useState(false)
+
   return (
     <div className='flex h-screen bg-gray-600'>
 
@@ -13,27 +26,41 @@ function Dashboard() {
       <div className='w-1/4 bg-gray-300 border-r border-gray-900 flex flex-col p-4'>
 
         {/*Profile Section*/}
-        <ProfileCard onEdit={() => setShowEdit(true)}/>
+        <ProfileCard onEdit={() => {
+          setShowEdit(true)
+          setShowAddFriend(false)
+          setShowSetting(false)}}/>
 
         {/*Chats & groups */}
         <div className='flex-1 overflow-y-auto p-4 rounded-xl bg-white m-4'>
           <h2 className='text-gray-600 text-sm font-semibold mb-2'>chats & groups</h2>
           <div className='space-y-2'>
-
+            <FriendList friends={dummyFriends}/>
           </div>
         </div>
         
 
         {/*Saved and others */}
         <div className='flex-none p-4 border-t border-gray-200 rounded-xl bg-white m-4'>
-          <div>saved</div>
-          <div>Add friend</div>
-          <div></div>
+          <div className='cursor-pointer mt-2 p-2 rounded-md hover:bg-gray-100'>inbox</div>
+          <div
+          className='cursor-pointer mt-2 p-2 rounded-md hover:bg-gray-100'
+          onClick={() => {
+            setShowAddFriend(true)
+            setShowEdit(false)
+            setShowSetting(false)
+          }}
+          >Add friend</div>
         </div>
 
         {/*Setting */}
         <div className='flex-none p-4 border-t border-gray-200 rounded-xl bg-white m-4'>
-          <div className='w-full text-left p-2 rounded-md hover:bg-gray-100'>setting</div>
+          <div className='w-full text-left p-2 rounded-md hover:bg-gray-100'
+          onClick={() => {
+            setShowAddFriend(false)
+            setShowEdit(false)
+            setShowSetting(true)
+          }}>setting</div>
         </div>
       </div>
 
@@ -43,13 +70,17 @@ function Dashboard() {
 
         {showEdit ? (
           <EditProfile />
-        ):(
+        ): showAddFriend ? (
+          <AddFriendDashboard />
+        ) : showSetting ? (
+          <Setting />
+        ): (
           <>
             <div className='p-4 bg-white border-b border-gray-300 flex items-center w-full justify-between'>
 
               {/*left side */}
               <div className='flex items-center space-x-3'>
-                <img src="" alt="" className='h-10 w-10 rounded-full bg-gray-300'/>
+                <img src="gjt" alt="" className='h-10 w-10 rounded-full bg-gray-300'/>
                 <div>
                   <div className='font-semibold'>Name</div>
                   <div className='text-gray-600 text-sm'>Status Online Or Last seen</div>

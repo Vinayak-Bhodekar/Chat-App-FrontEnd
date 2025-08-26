@@ -1,9 +1,44 @@
-import React, {useState} from 'react'
+import React, {useEffect, useState} from 'react'
+import useProfile from '../hooks/useProfile'
+import axios from 'axios'
 
 function EditProfile() {
 
-  const [name, setName] = useState("User Name")
+  const {profile} = useProfile()
+
+  const [userName, setUserName] = useState("")
+  const [firstName, setFirstName] = useState("")
+  const [lastName, setLastName] = useState("")
+  const [email, setEmail] = useState("")
   const [bio, setBio] = useState("Thsi is the user Bio ...")
+
+
+  useEffect(() => {
+    
+    if(profile) {
+      
+      setUserName(profile.userName || "")
+      setFirstName(profile.firstName || "")
+      setLastName(profile.lastName || "")
+      setEmail(profile.email || "")
+      //setBio(profile.bio || "")
+    }
+  },[profile])
+
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+
+    try {
+      const updatedInfo = {userName:userName, firstName:firstName, lastName:lastName, email:email, bio:bio}
+
+      console.log(updatedInfo)
+
+      const res = await axios.post("http://localhost:9000/api/Users/editProfile",updatedInfo,{withCredentials:true})
+    } catch (error) {
+      console.log("failed to update user Profile",error)
+    }
+  }
+
   return (
     <div className='p-6'>
       <h2
@@ -11,7 +46,8 @@ function EditProfile() {
       >Edit Profile</h2>
 
       <form 
-      className='space-y-4 max-w-md'>
+      className='space-y-4 max-w-md'
+      onSubmit={handleSubmit}>
 
         {/*Profile Picture */}
         <div>
@@ -19,12 +55,39 @@ function EditProfile() {
           <input type="file" className='w-full border rounded-lg p-2' />
         </div>
 
-        {/*Name */}
+        {/*First Name */}
         <div>
-          <label className='block text-sm font medium text-gray-700 mb-1'>Name</label>
+          <label className='block text-sm font medium text-gray-700 mb-1'>First Name</label>
           <input type="text"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
+          value={firstName}
+          onChange={(e) => setFirstName(e.target.value)}
+          className='w-full border rounded-lg p-2 focus:ring-blue-400 focus: outline-none'/>
+        </div>
+
+        {/*Last NAme */}
+        <div>
+          <label className='block text-sm font medium text-gray-700 mb-1'>Last Name</label>
+          <input type="text"
+          value={lastName}
+          onChange={(e) => setLastName(e.target.value)}
+          className='w-full border rounded-lg p-2 focus:ring-blue-400 focus: outline-none'/>
+        </div>
+
+        {/*user NAme */}
+        <div>
+          <label className='block text-sm font medium text-gray-700 mb-1'>User Name</label>
+          <input type="text"
+          value={userName}
+          onChange={(e) => setUserName(e.target.value)}
+          className='w-full border rounded-lg p-2 focus:ring-blue-400 focus: outline-none'/>
+        </div>
+
+        {/*email */}
+        <div>
+          <label className='block text-sm font medium text-gray-700 mb-1'>Email</label>
+          <input type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
           className='w-full border rounded-lg p-2 focus:ring-blue-400 focus: outline-none'/>
         </div>
 

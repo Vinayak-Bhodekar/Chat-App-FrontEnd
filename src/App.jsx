@@ -21,10 +21,11 @@ function App() {
     const checkAuth = async () => {
       try {
         const res = await axios.get("http://localhost:9000/api/Users/loggedUser");
-        console.log(res)
-        if(res.data.message.refreshToken) {
-          console.log("token",res.data.message.refreshToken)
+        
+        if(res.data.data.refreshToken) {
+          
           setIsAuthenticated(true)
+         
         } else {
           setIsAuthenticated(false)
         }
