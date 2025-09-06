@@ -7,6 +7,9 @@ import { Link } from 'react-router-dom'
 
 
 function Login({setIsAuthenticated}) {
+
+
+
   const [form, setForm] = useState({identity:"", password:""})
   const navigate = useNavigate();
 
@@ -17,6 +20,7 @@ function Login({setIsAuthenticated}) {
     try {
       const res = await axios.post("http://localhost:9000/api/Users/login", form, {withCredentials:true});
       // store it in localStorage for testing
+      localStorage.setItem("getProfile",JSON.stringify(res.data.data))
       setIsAuthenticated(true);
       navigate("/Dashboard")
     } catch (error) {

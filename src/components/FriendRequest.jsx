@@ -8,7 +8,6 @@ function FriendRequest() {
     const fetchRequests = async () => {
       try {
         const res = await axios.get("http://localhost:9000/api/Request/incomingRequests",{withCredentials:true})
-        console.log(res.data)
         setRequests(res.data.data)
       } catch (error) {
         console.log("error fetching requests",error)
@@ -17,12 +16,10 @@ function FriendRequest() {
     fetchRequests();
   },[]);
 
-  console.log(requests)
-
-  const handleAccept = async (id) => {
+  const handleAccept = async (res) => {
     try {
-      await axios.post("http://localhost:9000/api/Request/acceptRequest",{requestId:id},{withCredentials:true})
-      setRequests(requests.filter((req) => req._id !== id));
+      await axios.post("http://localhost:9000/api/Request/acceptRequest",{requestId:res._id,friendId:res.sender},{withCredentials:true})
+      setRequests(requests.filter((req) => req._id !== res._id));
     } catch (error) {
       console.log("error in accepting request",error)
     }
@@ -49,7 +46,7 @@ function FriendRequest() {
                   </div>
                   <div className='space-x-2'>
                     <button
-                    onClick={() => handleAccept(req._id)}
+                    onClick={() => handleAccept(req)}
                     className='bg-green-500 text-white px-3 py-1 rounded-lg hover:bg-green-600'>
                       Accept
                     </button>

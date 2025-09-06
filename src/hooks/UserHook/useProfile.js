@@ -9,10 +9,9 @@ function useProfile() {
 
     const fetchProfile = async () => {
         try {
-            const res = axios.get("http://localhost:9000/api/Users/loggedUser",{withCrendtials:true}).then(res => {
+            const res = axios.get("http://localhost:9000/api/Users/loggedUser",{withCredentials:true}).then(res => {
                 setProfile(res.data.data)
             })
-            
         } catch (error) {
             console.log("error Fetching data",error)
             

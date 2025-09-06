@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react'
-import useProfile from '../hooks/useProfile'
+import useProfile from '../hooks/UserHook/useProfile'
 import axios from 'axios'
 
 function EditProfile() {

@@ -1,6 +1,6 @@
 import React from "react"
 import axios from 'axios'
-import useProfile from "../hooks/useProfile.js"
+import useProfile from "../hooks/UserHook/useProfile.js"
 
 function ProfileCard({onEdit}) {
 

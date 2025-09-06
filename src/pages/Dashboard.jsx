@@ -1,23 +1,47 @@
-import axios from 'axios'
-import React, { useState } from 'react'
-import {useNavigate} from "react-router-dom"
+import { useState,useEffect } from 'react'
 import ProfileCard from '../components/ProfileCard'
 import EditProfile from '../components/EditProfile'
-import FriendList from '../components/FriendList'
+import FriendList from '../components/FriendList/FriendList'
 import AddFriendDashboard from '../components/AddFriendDashboard'
 import Setting from '../components/Setting'
+import ChatBox from '../components/ChatBox/ChatBox.jsx'
+import useProfile from '../hooks/UserHook/useProfile.js'
+import socket from '../socket.js'
 
-const dummyFriends = [
-  { name: "Summit", avatar: "", lastMessage: "Hey, what’s up?" },
-  { name: "Vinayak", avatar: "", lastMessage: "Working on project 🚀" },
-  { name: "Ravi", avatar: "", lastMessage: "See you tomorrow!" },
-];
+
 
 function Dashboard() {
+
+
+  useEffect(() => {
+    if(!socket.connected) {
+      socket.connect()
+    }
+
+    const profile = JSON.parse(localStorage.getItem("getProfile"))
+    socket.auth = {token: profile?._id}
+
+    socket.on("connect", () => [
+      console.log("socket connected: ",socket.id)
+    ])
+
+    socket.on("disconnect", () => [
+      console.log("socket disconnected")
+    ])
+
+    return () => {
+      socket.off("connect")
+      socket.off("disconnect")
+    }
+
+  },[])
+
+  
 
     const [showEdit, setShowEdit] = useState(false)
     const [showAddFriend, setShowAddFriend] = useState(false)
     const [showSetting, setShowSetting] = useState(false)
+    const [selectedUser, setSelectedUser] = useState(null)
 
   return (
     <div className='flex h-screen bg-gray-600'>
@@ -29,26 +53,32 @@ function Dashboard() {
         <ProfileCard onEdit={() => {
           setShowEdit(true)
           setShowAddFriend(false)
-          setShowSetting(false)}}/>
+          setShowSetting(false)
+          setSelectedUser(null)}}/>
 
         {/*Chats & groups */}
         <div className='flex-1 overflow-y-auto p-4 rounded-xl bg-white m-4'>
           <h2 className='text-gray-600 text-sm font-semibold mb-2'>chats & groups</h2>
           <div className='space-y-2'>
-            <FriendList friends={dummyFriends}/>
+            <FriendList onChat={(friend,room) => {
+              setShowEdit(false)
+              setShowAddFriend(false)
+              setShowSetting(false)
+              setSelectedUser({friend,room})
+            }}/>
           </div>
         </div>
         
 
         {/*Saved and others */}
         <div className='flex-none p-4 border-t border-gray-200 rounded-xl bg-white m-4'>
-          <div className='cursor-pointer mt-2 p-2 rounded-md hover:bg-gray-100'>inbox</div>
           <div
-          className='cursor-pointer mt-2 p-2 rounded-md hover:bg-gray-100'
+          className='cursor-pointer m-1 p-1 rounded-md hover:bg-gray-100'
           onClick={() => {
             setShowAddFriend(true)
             setShowEdit(false)
             setShowSetting(false)
+            setSelectedUser(null)
           }}
           >Add friend</div>
         </div>
@@ -60,62 +90,28 @@ function Dashboard() {
             setShowAddFriend(false)
             setShowEdit(false)
             setShowSetting(true)
+            setSelectedUser(null)
           }}>setting</div>
         </div>
       </div>
 
       {/*Main*/}
-      <div className='flex flex-1 flex-col'>
-        {/*Message Header*/}
-
-        {showEdit ? (
-          <EditProfile />
-        ): showAddFriend ? (
-          <AddFriendDashboard />
-        ) : showSetting ? (
-          <Setting />
-        ): (
-          <>
-            <div className='p-4 bg-white border-b border-gray-300 flex items-center w-full justify-between'>
-
-              {/*left side */}
-              <div className='flex items-center space-x-3'>
-                <img src="gjt" alt="" className='h-10 w-10 rounded-full bg-gray-300'/>
-                <div>
-                  <div className='font-semibold'>Name</div>
-                  <div className='text-gray-600 text-sm'>Status Online Or Last seen</div>
-                </div>
-              </div>
-
-              {/*Right side*/}
-              <div className='flex space-x-4'>
-                <div className=''>notification ON/OFF</div>
-                <div className=''>Chat setting</div>
-              </div>
-            </div>
-
-            { /*MEssages Area*/ }
-            <div className='flex-1 p-4 overflow-y-auto space-y-4 bg-gray-200'> 
-              {/*Receiver side*/}
-              <div className='flex justify-start'>
-                <div className='bg-white p-2 rounded-sm'>receiver messages</div>
-              </div>
-              <div className='flex justify-end'>
-                <div className='bg-white p-2 rounded-sm'>sender messages</div>
-              </div> 
-            </div>
-
-            {/*Message Input*/}
-            <div className='p-4 bg-white border-t border-gray-300 flex items-center space-x-3'>
-                <input type="text"
-                placeholder='Type a message...'
-                className='flex-1 border rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-400'/>
-                <button className='bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600'>Send</button>
-            </div>
-          </>
-        )}
-        
-      </div>
+    <div className='flex flex-1 flex-col'>
+      {showEdit ? (
+        <EditProfile />
+      ) : showAddFriend ? (
+        <AddFriendDashboard />
+      ) : showSetting ? (
+        <Setting />
+      ) : selectedUser ? (
+        <ChatBox selectedUser={selectedUser} />
+      ) : (
+        // 👇 Fallback UI when no chat is selected
+        <div className="flex flex-1 items-center justify-center text-gray-500 text-lg">
+          👋 Welcome! Select a friend from the left to start chatting.
+        </div>
+      )}
+    </div>
     </div>
   )
 }

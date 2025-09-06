@@ -1,17 +1,22 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
 import './App.css'
 import Login from './pages/Login'
 import Signup from './pages/Signup'
 import axios from 'axios';
 import Dashboard from "./pages/Dashboard"
 import VerifyEmail from './pages/VerifyEmail';
+import socket from './socket';
+import useProfile from './hooks/UserHook/useProfile';
 
 axios.defaults.withCredentials = true;
 
+
+
+
+
 function App() {
+  
 
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true)
