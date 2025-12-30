@@ -11,13 +11,8 @@ import useProfile from './hooks/UserHook/useProfile';
 
 axios.defaults.withCredentials = true;
 
-
-
-
-
 function App() {
   
-
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true)
 
@@ -52,7 +47,7 @@ function App() {
         <Route path="/login" element={<Login setIsAuthenticated={setIsAuthenticated} />} />
         <Route path="/signup" element={<Signup setIsAuthenticated={setIsAuthenticated} />} />
         <Route path="/verifyemail" element={<VerifyEmail />} />
-        <Route path="/dashboard" element={isAuthenticated ? <Dashboard /> : <Navigate to="/login" />} replace />
+        <Route path="/dashboard" element={isAuthenticated ? <Dashboard setIsAuthenticated={setIsAuthenticated}/> : <Navigate to="/login" />} replace />
         <Route path="/"
         element={<Navigate to={isAuthenticated ? "/dashboard" : "/login"} replace />} />
       </Routes>

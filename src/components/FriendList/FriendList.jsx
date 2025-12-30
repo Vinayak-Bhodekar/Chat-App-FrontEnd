@@ -1,62 +1,71 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import FriendCard from './FriendCard'
-import useContact from '../../hooks/FriendList/useContact'
 import useProfile from '../../hooks/UserHook/useProfile.js'
-import getUser from '../../hooks/UserHook/getUser.js'
 import FriendItems from './FriendItems.jsx'
 import socket from '../../socket.js'
+import themeContext from '../../contexts/themeContext/themeContext.js'
 
-function FriendList({onChat}) {
+function FriendList({ onChat, onlineUsers, contacts }) {
 
-  const {contacts,loading} = useContact()
-  const {profile} = useProfile()
+  const profile = JSON.parse(localStorage.getItem("getProfile"));
+
+  const {darkMode,setDarkMode} = useContext(themeContext)
+
   
 
-  //if (loading) return <div className="text-gray-500">Loading...</div>;
-  if (!contacts) return <div className="text-red-500">Failed to load contacts</div>;
+  if (!contacts) return <div className="text-red-500">Failed to load contacts</div>
 
-  const handleClick = (userName,roomName) => {
-    onChat(null,room)
-    if(socket.connected) {
-      socket.emit("joinRoom",roomName,userName)
+  const handleClick = (userName, roomName) => {
+    onChat(null, roomName)
+
+    if (socket.connected) {
+      socket.emit("joinRoom", roomName, userName)
     } else {
       socket.on("connect", () => {
-        socket.emit("joinRoom",roomName,userName)
+        socket.emit("joinRoom", roomName, userName)
       })
     }
   }
-  
-  return (
-    <div className='flex-1 overflow-y-auto p-4 rounded-xl bg-white m-4'>
-        <h2 className='text-gray-600 text-sm font-semibold mb-3'>Friends</h2>
-        <div className='space-y-2'>
-            {
-                contacts.map((room,idx) => {
 
-                  if(room.isGroupChat) {
-                    return (
-                      <FriendCard 
-                        key={idx}
-                        name={room.roomName}
-                        status={`${room.members.length} members`}
-                        avatar={room.groupAvatar || "group.png"}
-                        onClick={() => handleClick(profile?.userName,room?.roomName)}
-                      />
-                    )
-                  } else {
-                    const friend = room.members.find(member => member !== profile?._id)
-                    return (
-                      <FriendItems 
-                        key={idx}
-                        friend={friend}
-                        room={room}
-                        onChat={onChat}
-                      />
-                    )
-                  }
-              })
-            }
-        </div>
+  return (
+    <div className={`flex-1 overflow-y-auto p-2 rounded-xl 
+      ${darkMode ? "bg-slate-700 text-slate-200" : "bg-stone-100 text-gray-800"}`}>
+
+      <div className="space-y-2">
+
+        {contacts.map((contact) => {
+          const isOnline = onlineUsers?.[contact?.friend] === "Online"
+          if (contact?.isGroup) {
+            
+            return (
+              <FriendCard
+                key={contact?.friend}
+                friend={contact?.friend}
+                room={contact?.room}
+                name={contact?.name}
+                avatar={contact?.avatar || "group.png"}
+                darkMode={darkMode}
+                onClick={() => handleClick(profile?.userName, contact?.name)}
+              />
+            )
+          } else {
+
+            return (
+              <FriendItems
+                key={contact?.friend}
+                friend={contact?.friend}
+                room={contact?.room}
+                name={contact?.name}
+                avatar={contact?.avatar}
+                onChat={onChat}
+                darkMode={darkMode}
+                isOnline={isOnline}
+              />
+            )
+          }
+        })}
+
+      </div>
     </div>
   )
 }

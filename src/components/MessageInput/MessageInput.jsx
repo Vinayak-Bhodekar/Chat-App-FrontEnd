@@ -1,23 +1,27 @@
 import axios from 'axios'
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useContext } from 'react'
 import socket from '../../socket'
+import useContact from '../../hooks/FriendList/useContact'
+import themeContext from '../../contexts/themeContext/themeContext'
 
 function MessageInput({selectedRoom,user}) {
+
+  console.log(selectedRoom)
+
+  const {darkMode, setDarkMode} = useContext(themeContext)
 
     const [input,setInput] = useState("")
 
     const profile = JSON.parse(localStorage.getItem("getProfile"))
-    
+    console.log(profile)
 
-    /*const handleChange = (e) => {
-      setInput(e.target.value)
+    const handleIsTyping = async (roomId,profile) => {
+      socket.emit("typing",{roomId,profile})
+    }
 
-      if(e.target.value.length > 0) {
-        onTyping?.()
-      } else {
-        onStopTyping?.()
-      }
-    }*/
+    const handleIsStopTyping = async (roomId) => {
+      socket.emit("stopTyping",{roomId})
+    }
 
     const handleSend = async () => {
 
@@ -40,8 +44,15 @@ function MessageInput({selectedRoom,user}) {
           type="text"
           placeholder="Type a message..."
           value={input}
-          onChange={(e) => setInput(e.target.value)}
-          className="flex-1 border rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+          className={`flex-1 ${darkMode ? "text-white":"text-gray-500"} border rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-400`}
+          onChange={(e) => {
+            setInput(e.target.value)
+            handleIsTyping(selectedRoom,profile)
+            clearTimeout(window.typingTimeout)
+            window.typingTimeout=setTimeout(() => {
+              handleIsStopTyping(selectedRoom)
+            },2000)
+          }}
         />
         <button
           onClick={handleSend}

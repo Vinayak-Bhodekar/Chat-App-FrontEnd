@@ -1,8 +1,10 @@
 import React, { useEffect,useState } from 'react'
 import axios from 'axios'
+import socket from '../socket';
 
 function FriendRequest() {
   const [requests, setRequests] = useState([])
+  const profile = JSON.parse(localStorage.getItem("getProfile"));
 
   useEffect(() => {
     const fetchRequests = async () => {
@@ -18,7 +20,7 @@ function FriendRequest() {
 
   const handleAccept = async (res) => {
     try {
-      await axios.post("http://localhost:9000/api/Request/acceptRequest",{requestId:res._id,friendId:res.sender},{withCredentials:true})
+      socket.emit("acceptRequest",{userId:profile?._id,requestId:res._id})
       setRequests(requests.filter((req) => req._id !== res._id));
     } catch (error) {
       console.log("error in accepting request",error)
@@ -32,6 +34,7 @@ function FriendRequest() {
       console.log("error in rejecting request",error)
     }
   }
+  
   return (
     <div>
         <h2 className='text-xl font-semibold mb-4'>Incoming Friend Requests</h2>
@@ -41,8 +44,8 @@ function FriendRequest() {
                 key={req._id}
                 className='flex justify-between items-center bg-white p-3 rounded-lg shadow-sm mb-2'>
                   <div>
-                    <div className='font-semibold'>{req.sender}</div>
-                    <div className='text-sm text-gray-500'>{req.sender}</div>
+                    <div className='font-semibold'>{req.sender.userName}</div>
+                    <div className='text-sm text-gray-500'>{req.sender.email}</div>
                   </div>
                   <div className='space-x-2'>
                     <button

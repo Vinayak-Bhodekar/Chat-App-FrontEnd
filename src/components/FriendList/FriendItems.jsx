@@ -2,11 +2,7 @@ import React, { useState } from 'react'
 import FriendCard from './FriendCard'
 import getUser from '../../hooks/UserHook/getUser'
 import socket from '../../socket'
-function FriendItems({friend,room,onChat}) {
-
-  const {user,loading} = getUser(friend)
-
-  if (loading) return <div className="text-gray-400">Loading...</div>
+function FriendItems({friend,room,name,avatar,darkMode,onChat,isOnline}) {
 
   const handleClick = (roomName,userName) => {
     onChat(friend,room)
@@ -27,9 +23,13 @@ function FriendItems({friend,room,onChat}) {
 
   return (
     <FriendCard 
-    name={user?.userName}
-    status={user?.status}
-    onClick={() => handleClick(room._id,profile.userName)}
+    friend={friend}
+    room={room}
+    name={name}
+    avatar={avatar}
+    darkMode={darkMode}
+    onClick={() => handleClick(room,profile.userName)}
+    isOnline={isOnline}
     />
   )
 }
