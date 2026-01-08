@@ -8,6 +8,7 @@ import Dashboard from "./pages/Dashboard"
 import VerifyEmail from './pages/VerifyEmail';
 import socket from './socket';
 import useProfile from './hooks/UserHook/useProfile';
+import { initAES } from './utils/crypto';
 
 axios.defaults.withCredentials = true;
 
@@ -15,6 +16,10 @@ function App() {
   
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    initAES();
+  }, []);
 
   useEffect(() => {
 

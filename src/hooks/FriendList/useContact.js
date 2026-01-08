@@ -12,7 +12,6 @@ function useContact() {
         try {
             const friend = await axios.get("http://localhost:9000/api/Rooms/getMyRooms",{withCredentials:true}).then(res => {
                 setContacts(res.data.data)
-                console.log(res.data.data)
             })
         } catch (error) {
             console.log("error in fetching contacts",error)

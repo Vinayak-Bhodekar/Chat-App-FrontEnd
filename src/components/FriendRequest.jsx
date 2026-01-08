@@ -1,6 +1,8 @@
 import React, { useEffect,useState } from 'react'
 import axios from 'axios'
 import socket from '../socket';
+import { encryptAESKeyWithRSA, generateAESKey } from '../utils/aes';
+import { importPublicKey } from '../utils/rsa';
 
 function FriendRequest() {
   const [requests, setRequests] = useState([])
@@ -11,6 +13,7 @@ function FriendRequest() {
       try {
         const res = await axios.get("http://localhost:9000/api/Request/incomingRequests",{withCredentials:true})
         setRequests(res.data.data)
+        console.log(res.data.data)
       } catch (error) {
         console.log("error fetching requests",error)
       }
@@ -20,7 +23,22 @@ function FriendRequest() {
 
   const handleAccept = async (res) => {
     try {
-      socket.emit("acceptRequest",{userId:profile?._id,requestId:res._id})
+      // AES part
+      const aes = await generateAESKey();
+      
+      const publicKey1 = await importPublicKey(res?.sender?.publicKey)
+      const publicKey2 = await importPublicKey(profile?.publicKey)
+
+      const user1EncryptedKey = await encryptAESKeyWithRSA(aes,publicKey1)
+      const user2EncryptedKey = await encryptAESKeyWithRSA(aes,publicKey2)
+
+      console.log(publicKey1,publicKey2)
+
+      const obj = [{user:res?.sender?._id, encryptedAESKey:user1EncryptedKey},{user:profile._id, encryptedAESKey:user2EncryptedKey}]
+      console.log(obj)
+      socket.emit("acceptRequest",{userId:profile?._id,requestId:res._id,obj:obj})
+      
+      
       setRequests(requests.filter((req) => req._id !== res._id));
     } catch (error) {
       console.log("error in accepting request",error)

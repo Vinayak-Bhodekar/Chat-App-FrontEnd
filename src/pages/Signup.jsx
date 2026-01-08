@@ -3,6 +3,10 @@ import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
 import Dashboard from './Dashboard'
 import VerifyEmail from './VerifyEmail'
+import { generateRSAKeyPair } from '../utils/rsa'
+import { saveRoomKey } from '../utils/indexDB'
+import { exportKeyToBase64 } from '../utils/cryptoConvertor'
+import { exportPrivateKey,exportPublicKey } from '../utils/rsa'
 
 
 function Signup({setIsAuthenticated}) {
@@ -16,8 +20,18 @@ function Signup({setIsAuthenticated}) {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-          await axios.post("http://localhost:9000/api/Users/register", form, {withCredentials: true})
-          alert("user created successfully")
+          const {publicKey,privateKey} = await generateRSAKeyPair();
+          
+          const publicKeyBase64 = await exportPublicKey(publicKey);
+          const privateKeyBase64 =await exportPrivateKey(privateKey)
+          
+          await saveRoomKey(privateKeyBase64)
+
+          const payload = {...form,publicKey:publicKeyBase64}
+
+          console.log(payload)
+          await axios.post("http://localhost:9000/api/Users/register", payload, {withCredentials: true})
+          
           const loginForm = {identity: form.email, password: form.password}
           await axios.post("http://localhost:9000/api/Users/login",loginForm, {withCredentials: true})
           navigate("/VerifyEmail")

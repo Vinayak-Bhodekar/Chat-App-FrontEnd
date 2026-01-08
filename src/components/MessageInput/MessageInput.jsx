@@ -3,17 +3,20 @@ import React, { useState, useEffect, useContext } from 'react'
 import socket from '../../socket'
 import useContact from '../../hooks/FriendList/useContact'
 import themeContext from '../../contexts/themeContext/themeContext'
+import { encryptMessage } from '../../utils/e2ee.js'
+import { decryptAESKeyWithRSA } from '../../utils/aes.js'
+import { getPrivateKey } from '../../utils/indexDB.js'
+import { importPrivateKey } from '../../utils/rsa.js'
+//import { getRoomKey } from '../../hooks/Encryption/useEncryption.js'
+//import { encryptMessage } from '../../utils/e2ee'
 
 function MessageInput({selectedRoom,user}) {
-
-  console.log(selectedRoom)
 
   const {darkMode, setDarkMode} = useContext(themeContext)
 
     const [input,setInput] = useState("")
 
     const profile = JSON.parse(localStorage.getItem("getProfile"))
-    console.log(profile)
 
     const handleIsTyping = async (roomId,profile) => {
       socket.emit("typing",{roomId,profile})
@@ -27,12 +30,16 @@ function MessageInput({selectedRoom,user}) {
 
       if(!input.trim()) return
 
-      console.log(selectedRoom,user,input)
-
+      const res = await axios.get(`http://localhost:9000/api/RoomKey/${selectedRoom?._id}/${profile?._id}`)
+      const key = res.data.data
+      const privateRSAKey = await getPrivateKey()  // encrypted private key
+      const importedRSAKey = await importPrivateKey(privateRSAKey) // decrypted private Key
+      const decryptedAESKey = await decryptAESKeyWithRSA(key?.encryptedAESKey,importedRSAKey) // decrypted aes key
+      const encrypted = await encryptMessage(decryptedAESKey,input);
       socket.emit("sendMessage",{
         roomId:selectedRoom?._id,
         senderId:profile?._id,
-        content:input
+        content:{cipherText:encrypted?.cipherText,iv:encrypted?.iv}
       });
 
       setInput("")

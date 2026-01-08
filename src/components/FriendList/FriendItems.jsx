@@ -5,8 +5,7 @@ import socket from '../../socket'
 function FriendItems({friend,room,name,avatar,darkMode,onChat,isOnline}) {
 
   const handleClick = (roomName,userName) => {
-    onChat(friend,room)
-    console.log("friend clicked")
+    onChat({name,avatar},room)
     if(socket.connected) {
       console.log("socket connected")
       socket.emit("joinRoom",roomName,userName)
