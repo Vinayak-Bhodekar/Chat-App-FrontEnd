@@ -20,7 +20,6 @@ function FriendRequestContextProvider({children}) {
 
     socket.on("incomming-request", (newRequest) => {
       setFriendRequests(prev => prev+1)
-      console.log(newRequest)
     })
 
     return () => {

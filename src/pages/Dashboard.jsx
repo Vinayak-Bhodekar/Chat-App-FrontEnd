@@ -12,29 +12,29 @@ import themeContext from '../contexts/themeContext/themeContext.js'
 import axios from 'axios'
 import friendRequestContext from '../contexts/friendRequestContext/friendRequestContext.js'
 
-function Dashboard({ setIsAuthenticated }) {
- 
+function Dashboard({ setIsAuthenticated, isAuthenticated }) {
+
   const { darkMode, setDarkMode } = useContext(themeContext)
 
   const [onlineUsers, setOnlineUsers] = useState({})
-  const {friendRequests, clearRequests} = useContext(friendRequestContext)
+  const { friendRequests, clearRequests } = useContext(friendRequestContext)
   const [contacts, setContacts] = useState([])
   const contact = useContact()
 
   const [requests, setRequests] = useState([])
-  
-  
+
+
   useEffect(() => {
     const fetchRequests = async () => {
       try {
-        const res = await axios.get("http://localhost:9000/api/Request/incomingRequests",{withCredentials:true})
+        const res = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/Request/incomingRequests`, { withCredentials: true })
         setRequests(res.data.data)
       } catch (error) {
-        console.log("error fetching requests",error)
+        console.log("error fetching requests", error)
       }
     }
     fetchRequests();
-  },[]);
+  }, []);
 
   // Set contacts
   useEffect(() => {
@@ -69,21 +69,28 @@ function Dashboard({ setIsAuthenticated }) {
       setOnlineUsers((prev) => ({ ...prev, [userId]: status }))
     })
 
-    
-    socket.on("friend-added",async ({contact}) => {
-      console.log(contact)
-      setContacts((prev) => [...prev,contact])
+
+    socket.on("friend-added", async ({ contact }) => {
+      setContacts((prev) => [...prev, contact])
     })
+
+    socket.on("incomming-request", ({ newRequest }) => {
+    })
+
+    socket.on("contact-delete", ({ roomId }) => {
+      setContacts((prev) =>
+        prev.filter((contact) => contact?.room?._id !== roomId)
+      );
+    });
 
     return () => {
       socket.off("connect")
       socket.off("disconnect")
       socket.off("user:status")
-      
+      socket.off("contact-delete")
       socket.off("friend-added")
     }
   }, [])
-
   const [showEdit, setShowEdit] = useState(false)
   const [showAddFriend, setShowAddFriend] = useState(false)
   const [showSetting, setShowSetting] = useState(false)
@@ -176,13 +183,13 @@ function Dashboard({ setIsAuthenticated }) {
       {/* MAIN CONTENT */}
       <div className="flex flex-1 flex-col">
         {showEdit ? (
-          <EditProfile onBack = {() => setShowEdit(false)}/>
+          <EditProfile onBack={() => setShowEdit(false)} />
         ) : showAddFriend ? (
-          <AddFriendDashboard contacts={contacts} friendRequests={friendRequests} onBack = {() => setShowAddFriend(false)}/>
+          <AddFriendDashboard contacts={contacts} friendRequests={friendRequests} onBack={() => setShowAddFriend(false)} />
         ) : showSetting ? (
-          <Setting setIsAuthenticated={setIsAuthenticated}/>
+          <Setting setIsAuthenticated={setIsAuthenticated} />
         ) : selectedUser ? (
-          <ChatBox selectedUser={selectedUser} setContacts={setContacts} contacts={contacts} />
+          <ChatBox selectedUser={selectedUser} setContacts={setContacts} contacts={contacts} onBack={() => setSelectedUser(null)} />
         ) : (
           <div
             className={`flex flex-1 items-center justify-center text-lg 

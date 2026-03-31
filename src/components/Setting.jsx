@@ -16,7 +16,7 @@ function Setting({setIsAuthenticated}) {
         e.preventDefault()
 
         try {
-            await axios.get("http://localhost:9000/api/Users/logout",{withCredentials:true})
+            await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/Users/logout`,{withCredentials:true})
             
             localStorage.removeItem("getProfile");
 

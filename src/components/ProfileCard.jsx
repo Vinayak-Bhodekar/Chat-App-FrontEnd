@@ -6,7 +6,7 @@ import profileContext from "../contexts/profileContext/profileContext.js"
 function ProfileCard({ onEdit}) {
 
   let {profile,loading} = useContext(profileContext)
-
+  
   const {darkMode,setDarkMode} = useContext(themeContext)
 
   if (loading) return <div className="text-gray-500">Loading...</div>
@@ -23,7 +23,7 @@ function ProfileCard({ onEdit}) {
 
       {/* Profile Picture */}
       <img
-        src={profile.url || profile.profile}
+        src={profile.url || profile.profile || "https://cutiedp.com/wp-content/uploads/2025/08/no-dp-image-1.webp"}
         alt="Profile"
         className="h-20 w-20 rounded-full object-cover bg-gray-300 shadow"
       />

@@ -7,7 +7,7 @@ function IncommingRequests() {
 
     const fetchRequests = async () => {
         try {
-            const request = await axios.get("http://localhost:9000/api/Request/getAllRequest",{withCredentials:true}).then(res => {
+            const request = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/Request/getAllRequest`,{withCredentials:true}).then(res => {
                 setRequests(res.data.data);
                 
             })

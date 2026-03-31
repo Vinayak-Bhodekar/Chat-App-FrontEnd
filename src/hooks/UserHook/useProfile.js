@@ -9,7 +9,7 @@ function useProfile() {
 
     const fetchProfile = async () => {
         try {
-            const res = axios.get("http://localhost:9000/api/Users/loggedUser",{withCredentials:true}).then(res => {
+            const res = axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/Users/loggedUser`,{withCredentials:true}).then(res => {
                 setProfile(res.data.data)
             })
         } catch (error) {

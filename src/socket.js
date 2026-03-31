@@ -1,10 +1,11 @@
-import {io} from "socket.io-client"
-import useProfile from "./hooks/UserHook/useProfile.js"
+import { io } from "socket.io-client";
 
-const ENDPOINT = "http://localhost:9000"
+const ENDPOINT = import.meta.env.VITE_BACKEND_URL;
 
 const socket = io(ENDPOINT, {
-    autoConnect:false
-})
+    autoConnect: false,
+    withCredentials: true,
+    transports: ["websocket"]
+});
 
-export default socket
+export default socket;

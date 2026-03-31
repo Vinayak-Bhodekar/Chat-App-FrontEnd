@@ -10,22 +10,22 @@ function useContact() {
 
     const fetchContact = async () => {
         try {
-            const friend = await axios.get("http://localhost:9000/api/Rooms/getMyRooms",{withCredentials:true}).then(res => {
+            const friend = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/Rooms/getMyRooms`, { withCredentials: true }).then(res => {
                 setContacts(res.data.data)
             })
         } catch (error) {
-            console.log("error in fetching contacts",error)
+            console.log("error in fetching contacts", error)
         }
-        finally{
+        finally {
             setLoading(false)
         }
     }
 
     useEffect(() => {
         fetchContact()
-    },[])
+    }, [])
 
-  return {contacts, loading, refetch: fetchContact, setContacts}
+    return { contacts, loading, refetch: fetchContact, setContacts }
 }
 
 export default useContact

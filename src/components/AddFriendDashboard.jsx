@@ -11,7 +11,7 @@ function AddFriendDashboard({ contacts, friendRequests = [], onBack}) {
 
   const handleBackButton = async (e) => {
     e.preventDefault()
-    console.log("press back button")
+    
     navigate("/Dashboard")
   }
 

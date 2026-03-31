@@ -9,7 +9,7 @@ function getUser(userId) {
 
     const fetchUser = async () => {
         try {
-            const user = await axios.post("http://localhost:9000/api/Users/getUserInfo",{userId:userId}).then(res => 
+            const user = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/Users/getUserInfo`,{userId:userId}).then(res => 
                 {setUser(res.data.data)
             })
 

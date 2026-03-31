@@ -22,7 +22,7 @@ function AddFriend({ contacts }) {
       if (query) {
 
         // fetch api
-        const users = await axios.get("http://localhost:9000/api/Users/getAllUsers", {
+        const users = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/Users/getAllUsers`, {
           withCredentials: true,
         });
 
@@ -72,7 +72,6 @@ function AddFriend({ contacts }) {
     e.preventDefault();
 
     try {
-      
       socket.emit("sendRequest",{userId:profile?._id, receiverId:id})
 
       setResults(
@@ -87,10 +86,10 @@ function AddFriend({ contacts }) {
 
   const handleRemoveFriend = async (e, id) => {
     e.preventDefault();
-    console.log(id)
+    
     try {
       await axios.post(
-        "http://localhost:9000/api/Request/rejectRequest",
+        `${import.meta.env.VITE_BACKEND_URL}/api/Request/rejectRequest`,
         { requestId: id?.requestedId },
         { withCredentials: true }
       );

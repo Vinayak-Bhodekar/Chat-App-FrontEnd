@@ -25,9 +25,6 @@ export async function exportPrivateKey(privateKey) {
 
 export async function importPublicKey(base64Key) {
 
-  console.log("Public key type:", typeof base64Key);
-  console.log("Public key value:", base64Key);
-
   // Convert base64 → ArrayBuffer
   const binary = atob(base64Key);
   const bytes = new Uint8Array(binary.length);
@@ -61,8 +58,6 @@ export async function importPrivateKey(privateKeyBase64) {
   for (let i = 0; i < binary.length; i++) {
     bytes[i] = binary.charCodeAt(i);
   }
-
-  console.log()
 
   return crypto.subtle.importKey(
     "pkcs8",                     

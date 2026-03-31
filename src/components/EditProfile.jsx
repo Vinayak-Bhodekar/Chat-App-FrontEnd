@@ -42,7 +42,7 @@ function EditProfile({onBack}) {
       };
 
       const profileRes = await axios.post(
-        "http://localhost:9000/api/Users/editProfile",
+        `${import.meta.env.VITE_BACKEND_URL}/api/Users/editProfile`,
         updatedInfo,
         { withCredentials: true }
       );
@@ -55,14 +55,12 @@ function EditProfile({onBack}) {
         formData.append("profile", file);
 
         imageRes = await axios.post(
-          "http://localhost:9000/api/Users/userProfile",
+          `${import.meta.env.VITE_BACKEND_URL}/api/Users/userProfile`,
           formData,
           { withCredentials: true }
         );
       }
-      console.log("image-",imageRes)
-      console.log("profile-",profileRes)
-
+      
       const updatedProfile = {
         ...profileRes?.data?.data,
         ...(imageRes?.data?.data || {})
@@ -74,7 +72,6 @@ function EditProfile({onBack}) {
         JSON.stringify(updatedProfile)
       );
 
-      console.log("Profile updated successfully");
     } catch (error) {
       console.log("Failed to update user profile:", error);
     }

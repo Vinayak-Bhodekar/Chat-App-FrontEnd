@@ -11,9 +11,9 @@ function FriendRequest() {
   useEffect(() => {
     const fetchRequests = async () => {
       try {
-        const res = await axios.get("http://localhost:9000/api/Request/incomingRequests",{withCredentials:true})
+        const res = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/Request/incomingRequests`,{withCredentials:true})
         setRequests(res.data.data)
-        console.log(res.data.data)
+        
       } catch (error) {
         console.log("error fetching requests",error)
       }
@@ -32,10 +32,8 @@ function FriendRequest() {
       const user1EncryptedKey = await encryptAESKeyWithRSA(aes,publicKey1)
       const user2EncryptedKey = await encryptAESKeyWithRSA(aes,publicKey2)
 
-      console.log(publicKey1,publicKey2)
-
       const obj = [{user:res?.sender?._id, encryptedAESKey:user1EncryptedKey},{user:profile._id, encryptedAESKey:user2EncryptedKey}]
-      console.log(obj)
+      
       socket.emit("acceptRequest",{userId:profile?._id,requestId:res._id,obj:obj})
       
       
@@ -46,7 +44,7 @@ function FriendRequest() {
   }
   const handleReject = async (id) => {
     try {
-      await axios.post("http://localhost:9000/api/Request/rejectRequest",{requestId:id},{withCredentials:true})
+      await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/Request/rejectRequest`,{requestId:id},{withCredentials:true})
       setRequests(requests.filter((req) => req._id !== id));
     } catch (error) {
       console.log("error in rejecting request",error)

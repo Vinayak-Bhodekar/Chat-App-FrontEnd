@@ -24,7 +24,6 @@ export async function encryptMessage(aesKey, plainText) {
 
 export async function decryptMessage(aesKey, cipherText, iv) {
   try {
-    console.log("yes")
     const decrypted = await crypto.subtle.decrypt(
       {
         name: "AES-GCM",
@@ -33,8 +32,7 @@ export async function decryptMessage(aesKey, cipherText, iv) {
       aesKey,
       new Uint8Array(cipherText)
     );
-    console.log("yes-",new TextDecoder().decode(decrypted))
-
+    
     return new TextDecoder().decode(decrypted);
   } catch(error) {
     throw new Error("Decryption failed",error);

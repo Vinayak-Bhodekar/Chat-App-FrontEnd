@@ -56,5 +56,5 @@ export async function decryptMessage(cipherText, iv) {
 }
 
 export function debugAES() {
-  console.log("AES KEY:", aesKey);
+  
 }

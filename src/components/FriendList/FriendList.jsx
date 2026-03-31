@@ -1,17 +1,22 @@
-import React, { useContext } from 'react'
+import React, { useContext, useEffect } from 'react'
 import FriendCard from './FriendCard'
 import useProfile from '../../hooks/UserHook/useProfile.js'
 import FriendItems from './FriendItems.jsx'
 import socket from '../../socket.js'
 import themeContext from '../../contexts/themeContext/themeContext.js'
+import unreadContext from '../../contexts/unreadMessageContext/unreadContext.js'
 
 function FriendList({ onChat, onlineUsers, contacts }) {
 
+  const { unread } = useContext(unreadContext);
+
+
   const profile = JSON.parse(localStorage.getItem("getProfile"));
 
-  const {darkMode,setDarkMode} = useContext(themeContext)
+  const { darkMode, setDarkMode } = useContext(themeContext)
 
-  
+
+
 
   if (!contacts) return <div className="text-red-500">Failed to load contacts</div>
 
@@ -36,7 +41,7 @@ function FriendList({ onChat, onlineUsers, contacts }) {
         {contacts.map((contact) => {
           const isOnline = onlineUsers?.[contact?.friend] === "Online"
           if (contact?.isGroup) {
-            
+
             return (
               <FriendCard
                 key={contact?.friend}
@@ -60,6 +65,7 @@ function FriendList({ onChat, onlineUsers, contacts }) {
                 onChat={onChat}
                 darkMode={darkMode}
                 isOnline={isOnline}
+                unseenCount={unread[contact.room._id] || 0}
               />
             )
           }

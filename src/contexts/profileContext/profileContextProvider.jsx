@@ -1,44 +1,47 @@
-import { useEffect, useState } from "react";
-import profileContext from "./profileContext";
+import { useContext, useEffect, useState } from "react";
+import profileContext from "./profileContext.js";
 import axios from "axios";
+import authenticateContext from "../authenticateContext/authenticateContext.js";
 
 const ProfileContextProvider = ({ children }) => {
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
-
-  
-  useEffect(() => {
-    const storedProfile = localStorage.getItem("getProfile");
-
-    if (storedProfile && storedProfile !== "undefined") {
-      try {
-        setProfile(JSON.parse(storedProfile));
-      } catch (err) {
-        console.error("Invalid localStorage profile");
-        localStorage.removeItem("getProfile");
-      }
-    }
-
-    setLoading(false);
-  }, []);
+  const {isAuthenticated,setIsAuthenticate} = useContext(authenticateContext)
 
   
   useEffect(() => {
     const fetchProfile = async () => {
       try {
+        setLoading(true);
+
         const res = await axios.post(
-          "http://localhost:9000/api/Users/getUserInfo",
+          `${import.meta.env.VITE_BACKEND_URL}/api/Users/getUserInfo`,
+          {},
           { withCredentials: true }
         );
+
         setProfile(res.data.data);
         localStorage.setItem("getProfile", JSON.stringify(res.data.data));
+
       } catch (err) {
-        console.log("User not logged in");
+        console.log(err)
+        setProfile(null);
+        localStorage.removeItem("getProfile");
+      } finally {
+        setLoading(false);
       }
     };
+    
+    if (isAuthenticated) {
+      fetchProfile();
+    } else {
+      setProfile(null);
+      localStorage.removeItem("getProfile");
+      setLoading(false);
+    }
 
-    fetchProfile();
-  }, []);
+  }, [isAuthenticated]);
+
 
   return (
     <profileContext.Provider value={{ profile, setProfile, loading }}>
