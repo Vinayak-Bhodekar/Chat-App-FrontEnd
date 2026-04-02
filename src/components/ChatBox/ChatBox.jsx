@@ -54,6 +54,8 @@ function ChatBox({ selectedUser, setContacts, contacts, onBack }) {
         privateKey
       );
 
+      console.log("room key prepared", decryptedAESKey)
+
       aesKeyRef.current = decryptedAESKey
     }
 
@@ -106,6 +108,7 @@ function ChatBox({ selectedUser, setContacts, contacts, onBack }) {
       );
 
       setMessages(decrypted);
+      console.log("old message fetched", decrypted)
     }
 
     fetchMessages();
